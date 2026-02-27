@@ -1,0 +1,67 @@
+:root {
+  /* BRAND (dourado inspirado no logo) */
+  --gold-50:  #fff8e1;
+  --gold-100: #f7e7b0;
+  --gold-200: #edd28a;
+  --gold-300: #e0bd67;
+  --gold-400: #d2a84a;
+  --gold-500: #c99a3a; /* principal */
+  --gold-600: #b9872e; /* hover */
+  --gold-700: #9a6d22;
+
+  --gold-gradient: linear-gradient(
+    180deg,
+    #f5e6b6 0%,
+    #e7cf86 30%,
+    #caa24a 100%
+  );
+
+  /* Neutros (estilo mobile) */
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-2: #fafafa;
+
+  --text: #111827;
+  --text-muted: #6b7280;
+  --text-soft: #9ca3af;
+
+  --border: rgba(17, 24, 39, 0.12);
+  --border-soft: rgba(17, 24, 39, 0.08);
+
+  /* Layout */
+  --container: 980px;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+
+  /* Espaçamento */
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Tipografia */
+  --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  --fs-1: 12px;
+  --fs-2: 14px;
+  --fs-3: 16px;
+  --fs-4: 20px;
+  --fs-5: 30px;
+
+  /* Sombras */
+  --shadow-sm: 0 6px 18px rgba(17, 24, 39, 0.08);
+  --shadow-md: 0 14px 40px rgba(17, 24, 39, 0.10);
+
+  /* Inputs/botões */
+  --input-bg: #f6f7f9;
+  --input-border: rgba(17, 24, 39, 0.12);
+
+  --btn-text: #1f2937;
+  --btn-disabled: rgba(201, 154, 58, 0.45);
+}
