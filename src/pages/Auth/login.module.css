@@ -1,0 +1,108 @@
+.page{
+  padding: var(--space-7) 0 var(--space-6);
+}
+
+.hero{
+  padding: var(--space-7) 0 var(--space-5);
+  text-align: center;
+}
+
+.brand{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.logo{
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
+  padding: 10px;
+}
+
+.title{
+  margin: 0;
+}
+
+.subtitle{
+  margin: 0;
+  max-width: 62ch;
+  color: var(--text-muted);
+}
+
+.main{
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2) 0 var(--space-6);
+}
+
+.card{
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+}
+
+.form{
+  display: grid;
+  gap: 12px;
+}
+
+.label{
+  display: grid;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.input{
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text);
+  outline: none;
+}
+
+.input:focus{
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.errorBox{
+  background: rgba(239,68,68,0.10);
+  border: 1px solid rgba(239,68,68,0.35);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.actions{
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.hint{
+  text-align: center;
+  color: var(--text-soft);
+  margin-top: var(--space-2);
+}
+
+.footer{
+  margin-top: var(--space-7);
+  padding-bottom: var(--space-5);
+  text-align: center;
+  color: var(--text-soft);
+}
