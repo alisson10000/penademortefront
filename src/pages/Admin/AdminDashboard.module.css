@@ -1,20 +1,20 @@
-.page{
+.page {
   padding: var(--space-7) 0 var(--space-6);
 }
 
-.hero{
+.hero {
   padding: var(--space-7) 0 var(--space-6);
   text-align: center;
 }
 
-.brand{
+.brand {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
 }
 
-.logo{
+.logo {
   width: 120px;
   height: 120px;
   object-fit: contain;
@@ -25,17 +25,17 @@
   padding: 10px;
 }
 
-.title{
+.title {
   margin: 0;
 }
 
-.subtitle{
+.subtitle {
   margin: 0;
   max-width: 62ch;
   color: var(--text-muted);
 }
 
-.actions{
+.actions {
   display: flex;
   gap: 12px;
   justify-content: center;
@@ -43,7 +43,7 @@
   margin-top: var(--space-4);
 }
 
-.btnDanger{
+.btnDanger {
   padding: 10px 16px;
   border-radius: var(--radius-md);
   border: 1px solid rgba(239,68,68,0.35);
@@ -52,22 +52,22 @@
   cursor: pointer;
 }
 
-.btnDanger:hover{
+.btnDanger:hover {
   border-color: rgba(239,68,68,0.55);
 }
 
-.section{
+.section {
   margin: var(--space-6) 0;
 }
 
-.grid{
+.grid {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   margin-top: var(--space-3);
 }
 
-.card{
+.card {
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
@@ -76,88 +76,107 @@
   text-align: left;
 }
 
-.cardTitle{
+.cardTitle {
   display: block;
   margin-bottom: var(--space-2);
   color: var(--text);
 }
 
-.cardValue{
+.cardValue {
   font-size: 28px;
   font-weight: 800;
   margin-top: 4px;
 }
 
-.cardSub{
+.cardSub {
   margin-top: 8px;
   color: var(--text-soft);
 }
 
-.note{
+/* ✅ NOVO: Cards Por Pergunta - Vertical no Mobile */
+.questionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-top: var(--space-3);
-  color: var(--text-soft);
 }
 
-.tableWrap{
-  margin-top: var(--space-3);
+.questionCard {
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
+  padding: var(--space-5);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
 }
 
-.table{
-  width: 100%;
-  border-collapse: collapse;
+.questionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--space-4);
 }
 
-.table thead th{
-  text-align: left;
-  padding: 12px 14px;
+.questionId {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  align-self: flex-start;
+}
+
+.questionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.questionStats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 20px;
   font-weight: 700;
   color: var(--text);
-  border-bottom: 1px solid var(--border-soft);
 }
 
-.table tbody td{
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-soft);
-  color: var(--text);
-  vertical-align: top;
-}
-
-.table tbody tr:last-child td{
-  border-bottom: none;
-}
-
-/* ✅ NOVO: coluna ID */
-.idHead{
-  width: 90px;
-}
-
-.idCell{
-  width: 90px;
-  white-space: nowrap;
-  color: var(--text-muted);
-  font-weight: 700;
-}
-
-.questionCell{
-  max-width: 72ch;
-}
-
-.muted{
-  color: var(--text-muted);
-}
-
-.emptyRow{
+.statPercent {
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text-soft);
-  text-align: center;
-  padding: 18px 14px;
 }
 
-.stateBox{
+.emptyCard {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px dashed var(--border-soft);
+  border-radius: var(--radius-lg);
+}
+
+.note {
+  margin-top: var(--space-3);
+  color: var(--text-soft);
+}
+
+.stateBox {
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
@@ -166,18 +185,25 @@
   text-align: center;
 }
 
-.stateTitle{
+.stateTitle {
   margin: 0;
 }
 
-.stateText{
+.stateText {
   margin: 10px 0 0;
   color: var(--text-muted);
 }
 
-.footer{
+.footer {
   margin-top: var(--space-7);
   padding-bottom: var(--space-5);
   text-align: center;
   color: var(--text-soft);
+}
+
+/* Desktop: Cards por pergunta em grid (opcional) */
+@media (min-width: 768px) {
+  .questionGrid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
 }

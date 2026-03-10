@@ -128,7 +128,7 @@ export default function AdminDashboard() {
   return (
     <div className={styles.page}>
       <div className="container">
-        {/* HERO (padrão do tema) */}
+        {/* HERO */}
         <header className={styles.hero}>
           <div className={styles.brand}>
             <img className={styles.logo} src="/logo.png" alt="Pena de Morte" />
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* CARDS */}
+        {/* CARDS (mantido igual, responsivo) */}
         <section className={styles.section}>
           <h2>Estatísticas</h2>
           <div className={styles.grid}>
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* FORMULÁRIOS */}
+        {/* FORMULÁRIOS (mantido igual) */}
         <section className={styles.section}>
           <h2>Formulários</h2>
 
@@ -201,52 +201,50 @@ export default function AdminDashboard() {
           ) : null}
         </section>
 
-        {/* POR PERGUNTA (com coluna ID) */}
+        {/* POR PERGUNTA → CARDS VERTICAIS RESPONSIVOS */}
         <section className={styles.section}>
           <h2>Por Pergunta</h2>
 
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.idHead}>ID</th>
-                  <th>Pergunta</th>
-                  <th>Total</th>
-                  <th>Favoráveis</th>
-                  <th>Contrárias</th>
-                </tr>
-              </thead>
+          <div className={styles.questionGrid}>
+            {(stats?.by_question ?? []).map((q) => (
+              <div key={q.question_id} className={styles.questionCard}>
+                <div className={styles.questionHeader}>
+                  <span className={styles.questionId}>{q.question_id}º</span>
+                  <div className={styles.questionTitle}>{getQuestionText(q)}</div>
+                </div>
 
-              <tbody>
-                {(stats?.by_question ?? []).map((q) => (
-                  <tr key={q.question_id}>
-                    <td className={styles.idCell}>{q.question_id}&ordm;</td>
-                    <td className={styles.questionCell}>{getQuestionText(q)}</td>
-                    <td>{q.total_responses}</td>
-                    <td>
-                      {q.yes_responses}{" "}
-                      <span className={styles.muted}>({q.yes_percent}%)</span>
-                    </td>
-                    <td>
-                      {q.no_responses}{" "}
-                      <span className={styles.muted}>({q.no_percent}%)</span>
-                    </td>
-                  </tr>
-                ))}
+                <div className={styles.questionStats}>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Total</span>
+                    <span className={styles.statValue}>{q.total_responses}</span>
+                  </div>
 
-                {!stats?.by_question?.length ? (
-                  <tr>
-                    <td colSpan={5} className={styles.emptyRow}>
-                      Nenhum dado por pergunta encontrado.
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Favoráveis</span>
+                    <span className={styles.statValue}>
+                      {q.yes_responses} <span className={styles.statPercent}>({q.yes_percent}%)</span>
+                    </span>
+                  </div>
+
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Contrárias</span>
+                    <span className={styles.statValue}>
+                      {q.no_responses} <span className={styles.statPercent}>({q.no_percent}%)</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {!stats?.by_question?.length ? (
+              <div className={styles.emptyCard}>
+                Nenhum dado por pergunta encontrado.
+              </div>
+            ) : null}
           </div>
 
           <small className={styles.note}>
-            Se quiser, a gente ordena por <strong>order_index</strong> (do model `Question`).
+            Ordenado por <strong>order_index</strong> (do model `Question`).
           </small>
         </section>
 
