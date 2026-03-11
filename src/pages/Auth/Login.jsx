@@ -165,7 +165,7 @@ export default function Login() {
 
                 {resetSent ? (
                   <div className={styles.successBox}>
-                    ✅ Email enviado! Verifique sua caixa de entrada (válido 15min).
+                     Email enviado! Verifique sua caixa de entrada (válido 15min).
                     <br/>
                     <small>Não recebeu? <button 
                       type="button" 

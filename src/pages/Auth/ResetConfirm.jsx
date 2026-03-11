@@ -56,7 +56,6 @@ export default function ResetConfirm() {
         <div className={styles.container}>
           <div className={styles.successScreen}>
             <img className={styles.logo} src="/logo.png" alt="Pena de Morte" />
-            <div className={styles.icon}></div>
             <h1 className={styles.title}>Senha alterada!</h1>
             <p className={styles.subtitle}>
               Redirecionando para login...
