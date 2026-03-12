@@ -2,7 +2,9 @@ import { Routes, Route } from "react-router-dom"
 import Home from "../pages/home/home.jsx"
 import Login from "../pages/Auth/Login.jsx"
 import AdminDashboard from "../pages/Admin/AdminDashboard.jsx"
-import ResetConfirm from "../pages/Auth/ResetConfirm.jsx" // ✅ CORRETO
+import AdminAdsPage from "../pages/ads/AdminAdsPage.jsx"
+import ResetConfirm from "../pages/Auth/ResetConfirm.jsx"
+
 
 export function AppRoutes() {
   return (
@@ -13,7 +15,9 @@ export function AppRoutes() {
       {/* Backend emails usam ESTA */}
       <Route path="/reset-password" element={<ResetConfirm />} />
       
+      {/* Admin */}
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/ads" element={<AdminAdsPage />} />
     </Routes>
   )
 }

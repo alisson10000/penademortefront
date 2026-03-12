@@ -26,7 +26,10 @@ export default function AdminDashboard() {
           return;
         }
 
-        const [me, overview] = await Promise.all([adminMe(), getAdminStatsOverview()]);
+        const [me, overview] = await Promise.all([
+          adminMe(),
+          getAdminStatsOverview(),
+        ]);
         if (!alive) return;
 
         setAdmin(me);
@@ -112,10 +115,16 @@ export default function AdminDashboard() {
             <p className={styles.stateText}>{error}</p>
 
             <div className={styles.actions}>
-              <button className="btn-ghost" onClick={() => navigate("/", { replace: true })}>
+              <button
+                className="btn-ghost"
+                onClick={() => navigate("/", { replace: true })}
+              >
                 Voltar
               </button>
-              <button className="btn-primary" onClick={() => window.location.reload()}>
+              <button
+                className="btn-primary"
+                onClick={() => window.location.reload()}
+              >
                 Tentar novamente
               </button>
             </div>
@@ -146,9 +155,20 @@ export default function AdminDashboard() {
           </div>
 
           <div className={styles.actions}>
-            <button className="btn-ghost" onClick={() => navigate("/", { replace: true })}>
+            <button
+              className="btn-primary"
+              onClick={() => navigate("/admin/ads")}
+            >
+               Gerenciar Propagandas
+            </button>
+
+            <button
+              className="btn-ghost"
+              onClick={() => navigate("/", { replace: true })}
+            >
               Home
             </button>
+
             <button className={styles.btnDanger} onClick={handleLogout}>
               Sair
             </button>
@@ -177,7 +197,9 @@ export default function AdminDashboard() {
             <div className={styles.card}>
               <strong className={styles.cardTitle}>Total de Formulários</strong>
               <div className={styles.cardValue}>{forms?.total_forms ?? "--"}</div>
-              <div className={styles.cardSub}>Base: respondentes únicos (user_id)</div>
+              <div className={styles.cardSub}>
+                Base: respondentes únicos (user_id)
+              </div>
             </div>
 
             <div className={styles.card}>
@@ -188,15 +210,19 @@ export default function AdminDashboard() {
 
             <div className={styles.card}>
               <strong className={styles.cardTitle}>Incompletos</strong>
-              <div className={styles.cardValue}>{forms?.incomplete_forms ?? "--"}</div>
-              <div className={styles.cardSub}>{forms?.incomplete_percent ?? 0}%</div>
+              <div className={styles.cardValue}>
+                {forms?.incomplete_forms ?? "--"}
+              </div>
+              <div className={styles.cardSub}>
+                {forms?.incomplete_percent ?? 0}%
+              </div>
             </div>
           </div>
 
           {forms ? (
             <p className={styles.note}>
-              Considerado completo quando o respondente respondeu <strong>{forms.questions_total}</strong>{" "}
-              perguntas.
+              Considerado completo quando o respondente respondeu{" "}
+              <strong>{forms.questions_total}</strong> perguntas.
             </p>
           ) : null}
         </section>
@@ -210,26 +236,36 @@ export default function AdminDashboard() {
               <div key={q.question_id} className={styles.questionCard}>
                 <div className={styles.questionHeader}>
                   <span className={styles.questionId}>{q.question_id}º</span>
-                  <div className={styles.questionTitle}>{getQuestionText(q)}</div>
+                  <div className={styles.questionTitle}>
+                    {getQuestionText(q)}
+                  </div>
                 </div>
 
                 <div className={styles.questionStats}>
                   <div className={styles.statItem}>
                     <span className={styles.statLabel}>Total</span>
-                    <span className={styles.statValue}>{q.total_responses}</span>
+                    <span className={styles.statValue}>
+                      {q.total_responses}
+                    </span>
                   </div>
 
                   <div className={styles.statItem}>
                     <span className={styles.statLabel}>Favoráveis</span>
                     <span className={styles.statValue}>
-                      {q.yes_responses} <span className={styles.statPercent}>({q.yes_percent}%)</span>
+                      {q.yes_responses}{" "}
+                      <span className={styles.statPercent}>
+                        ({q.yes_percent}%)
+                      </span>
                     </span>
                   </div>
 
                   <div className={styles.statItem}>
                     <span className={styles.statLabel}>Contrárias</span>
                     <span className={styles.statValue}>
-                      {q.no_responses} <span className={styles.statPercent}>({q.no_percent}%)</span>
+                      {q.no_responses}{" "}
+                      <span className={styles.statPercent}>
+                        ({q.no_percent}%)
+                      </span>
                     </span>
                   </div>
                 </div>
