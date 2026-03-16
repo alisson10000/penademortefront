@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { api } from "../services/api";
 import styles from "./AdForm.module.css";
 
 export default function AdForm({
@@ -14,12 +15,13 @@ export default function AdForm({
     link: "",
     question_id: "",
     ativo: true,
-    created_by_id: 1, // ✅ ID do admin logado (você pode pegar do context/auth depois)
+    created_by_id: 1,
   });
 
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -35,11 +37,23 @@ export default function AdForm({
     }
   }, [initialData]);
 
+  // ✅ Converte URL relativa para absoluta
+  const getFullUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith("http")) return url;
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "https://penademorte.org/api";
+    return `${baseUrl}${url}`;
+  };
+
   const updatePreview = (tipo, url) => {
+    console.log("🔍 updatePreview chamado:", { tipo, url });
+    
     if (tipo === "youtube" && url) {
       setPreview(`https://www.youtube.com/embed/${url}`);
-    } else if (tipo === "image" && url) {
-      setPreview(url);
+    } else if ((tipo === "image" || tipo === "video") && url) {
+      const fullUrl = getFullUrl(url);
+      console.log("🔍 URL completa para preview:", fullUrl);
+      setPreview(fullUrl);
     } else {
       setPreview(null);
     }
@@ -63,6 +77,102 @@ export default function AdForm({
     setError("");
   };
 
+  // ✅ UPLOAD DE VÍDEO
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("video/")) {
+      setError("Arquivo deve ser um vídeo");
+      return;
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      setError("Vídeo muito grande (máximo 50MB)");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+
+      console.log("📤 Enviando vídeo:", file.name);
+
+      const response = await api.post("/ads/upload-video", uploadFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("✅ Upload concluído:", response.data);
+
+      setFormData((prev) => ({
+        ...prev,
+        tipo: "video",
+        url: response.data.url,
+      }));
+
+      updatePreview("video", response.data.url);
+    } catch (err) {
+      const msg = err?.response?.data?.detail || "Erro ao fazer upload do vídeo";
+      setError(msg);
+      console.error("❌ Erro no upload:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // ✅ UPLOAD DE IMAGEM
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Arquivo deve ser uma imagem");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Imagem muito grande (máximo 5MB)");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+
+      console.log("📤 Enviando imagem:", file.name);
+
+      const response = await api.post("/ads/upload-image", uploadFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("✅ Upload concluído:", response.data);
+
+      setFormData((prev) => ({
+        ...prev,
+        tipo: "image",
+        url: response.data.url,
+      }));
+
+      updatePreview("image", response.data.url);
+    } catch (err) {
+      const msg = err?.response?.data?.detail || "Erro ao fazer upload da imagem";
+      setError(msg);
+      console.error("❌ Erro no upload:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -78,15 +188,15 @@ export default function AdForm({
 
     setLoading(true);
     try {
-      // ✅ Converte question_id para número
       const dataToSubmit = {
         ...formData,
         question_id: parseInt(formData.question_id),
       };
+      console.log("💾 Salvando ad:", dataToSubmit);
       await onSubmit(dataToSubmit);
     } catch (err) {
       setError("Erro ao salvar propaganda");
-      console.error(err);
+      console.error("❌ Erro ao salvar:", err);
     } finally {
       setLoading(false);
     }
@@ -97,7 +207,7 @@ export default function AdForm({
       <div className={styles.formGrid}>
         {/* TIPO */}
         <div className={styles.group}>
-         <label htmlFor="tipo">Tipo de Propaganda *</label>
+          <label htmlFor="tipo">Tipo de Propaganda *</label>
           <select
             id="tipo"
             name="tipo"
@@ -107,11 +217,14 @@ export default function AdForm({
           >
             <option value="image">Imagem</option>
             <option value="youtube">YouTube</option>
+            <option value="video">Vídeo (MP4)</option>
           </select>
           <small>
             {formData.tipo === "image"
-              ? "URL da imagem (ex: /static/ads/banner.jpg)"
-              : "ID do vídeo YouTube (ex: dQw4w9WgXcQ)"}
+              ? "URL da imagem ou faça upload abaixo"
+              : formData.tipo === "youtube"
+              ? "ID do vídeo YouTube (ex: dQw4w9WgXcQ)"
+              : "URL do vídeo MP4 ou faça upload abaixo"}
           </small>
         </div>
 
@@ -126,11 +239,55 @@ export default function AdForm({
             onChange={handleChange}
             placeholder={
               formData.tipo === "image"
-                ? "/static/ads/banner.jpg"
-                : "dQw4w9WgXcQ"
+                ? "/static/images/banner.jpg"
+                : formData.tipo === "youtube"
+                ? "dQw4w9WgXcQ"
+                : "/static/videos/video.mp4"
             }
             required
           />
+        </div>
+
+        {/* UPLOAD BUTTONS */}
+        <div className={styles.group}>
+          <label>Upload de Arquivo</label>
+          <div className={styles.uploadButtons}>
+            {formData.tipo === "image" && (
+              <>
+                <input
+                  type="file"
+                  id="imageUpload"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: "none" }}
+                  disabled={uploading}
+                />
+                <label htmlFor="imageUpload" className={styles.uploadBtn}>
+                  {uploading ? "Enviando..." : "📷 Upload Imagem"}
+                </label>
+              </>
+            )}
+
+            {formData.tipo === "video" && (
+              <>
+                <input
+                  type="file"
+                  id="videoUpload"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  style={{ display: "none" }}
+                  disabled={uploading}
+                />
+                <label htmlFor="videoUpload" className={styles.uploadBtn}>
+                  {uploading ? "Enviando..." : "🎬 Upload Vídeo"}
+                </label>
+              </>
+            )}
+          </div>
+          <small>
+            {formData.tipo === "image" && "Máximo 5MB (JPG, PNG, WebP)"}
+            {formData.tipo === "video" && "Máximo 50MB (MP4, MOV)"}
+          </small>
         </div>
 
         {/* PERGUNTA */}
@@ -156,11 +313,6 @@ export default function AdForm({
               </option>
             )}
           </select>
-          <small>
-            {questions && questions.length === 0
-              ? "Nenhuma pergunta disponível"
-              : `${questions?.length || 0} perguntas disponíveis`}
-          </small>
         </div>
 
         {/* LINK */}
@@ -197,7 +349,7 @@ export default function AdForm({
           <h3>Prévia</h3>
           {formData.tipo === "image" ? (
             <img src={preview} alt="Preview" className={styles.previewImage} />
-          ) : (
+          ) : formData.tipo === "youtube" ? (
             <iframe
               width="100%"
               height="300"
@@ -207,7 +359,14 @@ export default function AdForm({
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
-          )}
+          ) : formData.tipo === "video" ? (
+            <video
+              src={preview}
+              controls
+              className={styles.previewImage}
+              style={{ maxHeight: "300px", width: "100%" }}
+            />
+          ) : null}
         </div>
       )}
 
@@ -219,12 +378,19 @@ export default function AdForm({
           type="button"
           className="btn-ghost"
           onClick={onCancel}
-          disabled={loading}
+          disabled={loading || uploading}
         >
           Cancelar
         </button>
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? "Salvando..." : isEditing ? "Atualizar" : "Criar"} Propaganda
+        <button type="submit" className="btn-primary" disabled={loading || uploading}>
+          {uploading
+            ? "Enviando arquivo..."
+            : loading
+            ? "Salvando..."
+            : isEditing
+            ? "Atualizar"
+            : "Criar"}{" "}
+          Propaganda
         </button>
       </div>
     </form>
