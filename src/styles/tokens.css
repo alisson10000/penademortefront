@@ -1,12 +1,12 @@
 :root {
-  /* BRAND (dourado inspirado no logo) */
-  --gold-50:  #fff8e1;
+  /* BRAND */
+  --gold-50: #fff8e1;
   --gold-100: #f7e7b0;
   --gold-200: #edd28a;
   --gold-300: #e0bd67;
   --gold-400: #d2a84a;
-  --gold-500: #c99a3a; /* principal */
-  --gold-600: #b9872e; /* hover */
+  --gold-500: #c99a3a;
+  --gold-600: #b9872e;
   --gold-700: #9a6d22;
 
   --gold-gradient: linear-gradient(
@@ -16,26 +16,13 @@
     #caa24a 100%
   );
 
-  /* Neutros (estilo mobile) */
-  --bg: #f3f4f6;
-  --surface: #ffffff;
-  --surface-2: #fafafa;
-
-  --text: #111827;
-  --text-muted: #6b7280;
-  --text-soft: #9ca3af;
-
-  --border: rgba(17, 24, 39, 0.12);
-  --border-soft: rgba(17, 24, 39, 0.08);
-
-  /* Layout */
   --container: 980px;
 
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
+  --radius-xl: 28px;
 
-  /* Espaçamento */
   --space-1: 6px;
   --space-2: 10px;
   --space-3: 14px;
@@ -45,7 +32,6 @@
   --space-7: 48px;
   --space-8: 64px;
 
-  /* Tipografia */
   --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
   --fs-1: 12px;
@@ -53,15 +39,63 @@
   --fs-3: 16px;
   --fs-4: 20px;
   --fs-5: 30px;
+  --fs-6: 40px;
+}
 
-  /* Sombras */
+/* TEMA CLARO */
+:root[data-theme="light"] {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-2: #fafafa;
+  --surface-3: #f6f7f9;
+
+  --text: #111827;
+  --text-muted: #6b7280;
+  --text-soft: #9ca3af;
+
+  --border: rgba(17, 24, 39, 0.12);
+  --border-soft: rgba(17, 24, 39, 0.08);
+
   --shadow-sm: 0 6px 18px rgba(17, 24, 39, 0.08);
-  --shadow-md: 0 14px 40px rgba(17, 24, 39, 0.10);
+  --shadow-md: 0 14px 40px rgba(17, 24, 39, 0.1);
+  --shadow-focus: 0 0 0 4px rgba(201, 154, 58, 0.18);
 
-  /* Inputs/botões */
   --input-bg: #f6f7f9;
   --input-border: rgba(17, 24, 39, 0.12);
+  --input-placeholder: #9ca3af;
 
   --btn-text: #1f2937;
   --btn-disabled: rgba(201, 154, 58, 0.45);
+
+  --focus-ring: rgba(201, 154, 58, 0.45);
+  --focus-ring-strong: rgba(201, 154, 58, 0.65);
+}
+
+/* TEMA ESCURO */
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --surface: #171a21;
+  --surface-2: #1d212b;
+  --surface-3: #232938;
+
+  --text: #f3f4f6;
+  --text-muted: #d1d5db;
+  --text-soft: #9ca3af;
+
+  --border: rgba(255, 255, 255, 0.12);
+  --border-soft: rgba(255, 255, 255, 0.08);
+
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 14px 40px rgba(0, 0, 0, 0.35);
+  --shadow-focus: 0 0 0 4px rgba(201, 154, 58, 0.18);
+
+  --input-bg: #1c2230;
+  --input-border: rgba(255, 255, 255, 0.12);
+  --input-placeholder: #94a3b8;
+
+  --btn-text: #111827;
+  --btn-disabled: rgba(201, 154, 58, 0.45);
+
+  --focus-ring: rgba(201, 154, 58, 0.45);
+  --focus-ring-strong: rgba(201, 154, 58, 0.65);
 }

@@ -24,8 +24,8 @@
 }
 
 .logo {
-  width: 100px;
-  height: 100px;
+  width: 104px;
+  height: 104px;
   object-fit: contain;
   border-radius: var(--radius-lg);
   background: var(--surface);
@@ -36,34 +36,50 @@
 
 .title {
   margin: 0;
-  color: var(--text);
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 700;
 }
 
 .subtitle {
   margin: 0;
-  max-width: 60ch;
+  max-width: 56ch;
   color: var(--text-muted);
-  font-size: var(--fs-3);
-  line-height: 1.6;
-  text-align: center;
 }
 
 .main {
   display: flex;
   justify-content: center;
-  padding: var(--space-4) 0 var(--space-6);
 }
 
 .card {
   width: 100%;
-  max-width: 440px;
+  max-width: 520px;
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  padding: var(--space-5);
+  padding: var(--space-6);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.tab {
+  border: 1px solid var(--border);
+  background: var(--surface-3);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-weight: 600;
+}
+
+.active {
+  background: var(--gold-gradient);
+  color: var(--btn-text);
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
 }
 
 .form {
@@ -76,44 +92,57 @@
   gap: var(--space-2);
   color: var(--text);
   font-weight: 600;
-  font-size: var(--fs-3);
 }
 
 .input {
   width: 100%;
 }
 
-.errorBox {
-  background: rgba(185, 28, 28, 0.08);
-  border: 1px solid rgba(185, 28, 28, 0.18);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
-  color: var(--danger, #b91c1c);
-  font-size: var(--fs-3);
-  line-height: 1.5;
-}
-
 .actions {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: var(--space-3);
-  margin-top: var(--space-2);
 }
 
 .hint {
   color: var(--text-soft);
-  font-size: var(--fs-2);
-  text-align: center;
 }
 
-.successScreen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: var(--space-8) 0;
+.errorBox {
+  background: rgba(185, 28, 28, 0.08);
+  border: 1px solid rgba(185, 28, 28, 0.18);
+  color: var(--danger, #b91c1c);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.successBox {
+  background: rgba(21, 128, 61, 0.08);
+  border: 1px solid rgba(21, 128, 61, 0.18);
+  color: var(--success, #15803d);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  line-height: 1.6;
+}
+
+.linkBtn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--gold-600);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.linkBtn:hover {
+  text-decoration: underline;
+}
+
+.footer {
+  margin-top: var(--space-7);
+  padding-bottom: var(--space-5);
   text-align: center;
+  color: var(--text-soft);
 }
 
 @media (max-width: 768px) {

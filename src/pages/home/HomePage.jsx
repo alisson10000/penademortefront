@@ -1,9 +1,47 @@
-import styles from "./home.module.css";
+import { useEffect, useState } from "react";
+import styles from "./HomePage.module.css";
 
 export default function Home() {
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      return;
+    }
+
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = prefersDark ? "dark" : "light";
+
+    setTheme(initialTheme);
+    document.documentElement.setAttribute("data-theme", initialTheme);
+  }, []);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("theme", nextTheme);
+  }
+
   return (
     <div className={styles.page}>
       <div className="container">
+        {/* TOPO / AÇÃO DE TEMA */}
+        <div className={styles.topBar}>
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+          >
+            {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo escuro"}
+          </button>
+        </div>
+
         {/* HERO */}
         <header className={styles.hero}>
           <div className={styles.brand}>
@@ -17,10 +55,15 @@ export default function Home() {
 
           <div className={styles.actions}>
             <a href="#download">
-              <button className="btn-primary">Baixar app (Android)</button>
+              <button type="button" className="btn-primary">
+                Baixar app (Android)
+              </button>
             </a>
+
             <a href="/login">
-              <button className="btn-ghost">Área Admin</button>
+              <button type="button" className="btn-ghost">
+                Área Admin
+              </button>
             </a>
           </div>
         </header>
@@ -33,10 +76,12 @@ export default function Home() {
               <strong className={styles.stepTitle}>1) Baixe o app</strong>
               <p>Instale no Android e comece em segundos.</p>
             </div>
+
             <div className={styles.stepCard}>
               <strong className={styles.stepTitle}>2) Responda rápido</strong>
               <p>Perguntas objetivas, resposta em 1 minuto.</p>
             </div>
+
             <div className={styles.stepCard}>
               <strong className={styles.stepTitle}>3) Veja estatísticas</strong>
               <p>Resultados exibidos de forma agregada e transparente.</p>
@@ -51,10 +96,19 @@ export default function Home() {
             <p>Escolha sua plataforma:</p>
 
             <div className={styles.downloadActions}>
-              <button className="btn-primary" onClick={() => window.open("#", "_blank")}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => window.open("#", "_blank")}
+              >
                 Android (APK/Play)
               </button>
-              <button className="btn-ghost" onClick={() => window.open("#", "_blank")}>
+
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => window.open("#", "_blank")}
+              >
                 iOS (em breve)
               </button>
             </div>

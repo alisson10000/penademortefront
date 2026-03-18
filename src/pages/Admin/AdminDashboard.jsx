@@ -9,11 +9,36 @@ import { getAdminStatsOverview } from "../../services/stats";
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
+  const [theme, setTheme] = useState("light");
   const [admin, setAdmin] = useState(null);
   const [stats, setStats] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      return;
+    }
+
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = prefersDark ? "dark" : "light";
+
+    setTheme(initialTheme);
+    document.documentElement.setAttribute("data-theme", initialTheme);
+  }, []);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("theme", nextTheme);
+  }
 
   useEffect(() => {
     let alive = true;
@@ -21,8 +46,9 @@ export default function AdminDashboard() {
     async function loadAll() {
       try {
         const token = getToken();
+
         if (!token) {
-          navigate("/login");
+          navigate("/login", { replace: true });
           return;
         }
 
@@ -30,12 +56,14 @@ export default function AdminDashboard() {
           adminMe(),
           getAdminStatsOverview(),
         ]);
+
         if (!alive) return;
 
         setAdmin(me);
         setStats(overview);
       } catch (err) {
         console.error(err);
+
         if (!alive) return;
 
         const msg =
@@ -47,7 +75,7 @@ export default function AdminDashboard() {
 
         if (err?.response?.status === 401) {
           clearToken();
-          navigate("/login");
+          navigate("/login", { replace: true });
         }
       } finally {
         if (alive) setLoading(false);
@@ -55,18 +83,46 @@ export default function AdminDashboard() {
     }
 
     loadAll();
+
     return () => {
       alive = false;
     };
   }, [navigate]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > 768) {
+        setMenuOpen(false);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   function handleLogout() {
     clearToken();
     navigate("/", { replace: true });
   }
 
+  function goToAds() {
+    setMenuOpen(false);
+    navigate("/admin/ads");
+  }
+
+  function goHome() {
+    setMenuOpen(false);
+    navigate("/", { replace: true });
+  }
+
+  function logoutAndClose() {
+    setMenuOpen(false);
+    handleLogout();
+  }
+
   const cards = useMemo(() => {
     if (!stats) return [];
+
     return [
       {
         title: "Total de Respostas",
@@ -88,15 +144,26 @@ export default function AdminDashboard() {
 
   const forms = stats?.forms;
 
-  const getQuestionText = (q) => {
+  function getQuestionText(q) {
     const txt = q?.question_text?.trim();
     return txt ? txt : "(sem título)";
-  };
+  }
 
   if (loading) {
     return (
       <div className={styles.page}>
         <div className="container">
+          <div className={styles.topBar}>
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+            >
+              {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo escuro"}
+            </button>
+          </div>
+
           <div className={styles.stateBox}>
             <h2 className={styles.stateTitle}>Carregando painel...</h2>
             <p className={styles.stateText}>Aguarde só um instante.</p>
@@ -110,18 +177,32 @@ export default function AdminDashboard() {
     return (
       <div className={styles.page}>
         <div className="container">
+          <div className={styles.topBar}>
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+            >
+              {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo escuro"}
+            </button>
+          </div>
+
           <div className={styles.stateBox}>
             <h2 className={styles.stateTitle}>Erro</h2>
             <p className={styles.stateText}>{error}</p>
 
-            <div className={styles.actions}>
+            <div className={styles.stateActions}>
               <button
+                type="button"
                 className="btn-ghost"
                 onClick={() => navigate("/", { replace: true })}
               >
                 Voltar
               </button>
+
               <button
+                type="button"
                 className="btn-primary"
                 onClick={() => window.location.reload()}
               >
@@ -137,7 +218,17 @@ export default function AdminDashboard() {
   return (
     <div className={styles.page}>
       <div className="container">
-        {/* HERO */}
+        <div className={styles.topBar}>
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+          >
+            {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo escuro"}
+          </button>
+        </div>
+
         <header className={styles.hero}>
           <div className={styles.brand}>
             <img className={styles.logo} src="/logo.png" alt="Pena de Morte" />
@@ -154,42 +245,94 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <div className={styles.actions}>
-            <button
-              className="btn-primary"
-              onClick={() => navigate("/admin/ads")}
-            >
-               Gerenciar Propagandas
-            </button>
+          <div className={styles.navArea}>
+            {/* Desktop */}
+            <div className={styles.actionsDesktop}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={goToAds}
+              >
+                Gerenciar Propagandas
+              </button>
 
-            <button
-              className="btn-ghost"
-              onClick={() => navigate("/", { replace: true })}
-            >
-              Home
-            </button>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={goHome}
+              >
+                Home
+              </button>
 
-            <button className={styles.btnDanger} onClick={handleLogout}>
-              Sair
-            </button>
+              <button
+                type="button"
+                className={styles.btnDanger}
+                onClick={logoutAndClose}
+              >
+                Sair
+              </button>
+            </div>
+
+            {/* Mobile */}
+            <div className={styles.actionsMobile}>
+              <button
+                type="button"
+                className={styles.menuButton}
+                onClick={() => setMenuOpen((prev) => !prev)}
+                aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+                aria-expanded={menuOpen}
+                aria-controls="admin-mobile-menu"
+              >
+                <span className={styles.menuIcon}></span>
+                <span className={styles.menuIcon}></span>
+                <span className={styles.menuIcon}></span>
+              </button>
+
+              {menuOpen && (
+                <div id="admin-mobile-menu" className={styles.mobileMenu}>
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={goToAds}
+                  >
+                    Gerenciar Propagandas
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-ghost"
+                    onClick={goHome}
+                  >
+                    Home
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.btnDanger}
+                    onClick={logoutAndClose}
+                  >
+                    Sair
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        {/* CARDS (mantido igual, responsivo) */}
         <section className={styles.section}>
           <h2>Estatísticas</h2>
+
           <div className={styles.grid}>
-            {cards.map((c) => (
-              <div key={c.title} className={styles.card}>
-                <strong className={styles.cardTitle}>{c.title}</strong>
-                <div className={styles.cardValue}>{c.value ?? "--"}</div>
-                <div className={styles.cardSub}>{c.sub}</div>
+            {cards.map((card) => (
+              <div key={card.title} className={styles.card}>
+                <strong className={styles.cardTitle}>{card.title}</strong>
+                <div className={styles.cardValue}>{card.value ?? "--"}</div>
+                <div className={styles.cardSub}>{card.sub}</div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* FORMULÁRIOS (mantido igual) */}
         <section className={styles.section}>
           <h2>Formulários</h2>
 
@@ -210,12 +353,8 @@ export default function AdminDashboard() {
 
             <div className={styles.card}>
               <strong className={styles.cardTitle}>Incompletos</strong>
-              <div className={styles.cardValue}>
-                {forms?.incomplete_forms ?? "--"}
-              </div>
-              <div className={styles.cardSub}>
-                {forms?.incomplete_percent ?? 0}%
-              </div>
+              <div className={styles.cardValue}>{forms?.incomplete_forms ?? "--"}</div>
+              <div className={styles.cardSub}>{forms?.incomplete_percent ?? 0}%</div>
             </div>
           </div>
 
@@ -227,7 +366,6 @@ export default function AdminDashboard() {
           ) : null}
         </section>
 
-        {/* POR PERGUNTA → CARDS VERTICAIS RESPONSIVOS */}
         <section className={styles.section}>
           <h2>Por Pergunta</h2>
 
@@ -236,26 +374,20 @@ export default function AdminDashboard() {
               <div key={q.question_id} className={styles.questionCard}>
                 <div className={styles.questionHeader}>
                   <span className={styles.questionId}>{q.question_id}º</span>
-                  <div className={styles.questionTitle}>
-                    {getQuestionText(q)}
-                  </div>
+                  <div className={styles.questionTitle}>{getQuestionText(q)}</div>
                 </div>
 
                 <div className={styles.questionStats}>
                   <div className={styles.statItem}>
                     <span className={styles.statLabel}>Total</span>
-                    <span className={styles.statValue}>
-                      {q.total_responses}
-                    </span>
+                    <span className={styles.statValue}>{q.total_responses}</span>
                   </div>
 
                   <div className={styles.statItem}>
                     <span className={styles.statLabel}>Favoráveis</span>
                     <span className={styles.statValue}>
                       {q.yes_responses}{" "}
-                      <span className={styles.statPercent}>
-                        ({q.yes_percent}%)
-                      </span>
+                      <span className={styles.statPercent}>({q.yes_percent}%)</span>
                     </span>
                   </div>
 
@@ -263,9 +395,7 @@ export default function AdminDashboard() {
                     <span className={styles.statLabel}>Contrárias</span>
                     <span className={styles.statValue}>
                       {q.no_responses}{" "}
-                      <span className={styles.statPercent}>
-                        ({q.no_percent}%)
-                      </span>
+                      <span className={styles.statPercent}>({q.no_percent}%)</span>
                     </span>
                   </div>
                 </div>
@@ -280,7 +410,7 @@ export default function AdminDashboard() {
           </div>
 
           <small className={styles.note}>
-            Ordenado por <strong>order_index</strong> (do model `Question`).
+            Ordenado por <strong>order_index</strong>.
           </small>
         </section>
 

@@ -1,28 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import styles from "./login.module.css";
+import toast from "react-hot-toast";
+
+import styles from "./LoginPage.module.css";
 import { adminLogin, resetPasswordRequest } from "../../services/auth";
-import toast from "react-hot-toast";  // npm i react-hot-toast
 
 export default function Login() {
   const nav = useNavigate();
   const loc = useLocation();
-  
-  // Tabs: login / reset
+
+  const [theme, setTheme] = useState("light");
+
   const [tab, setTab] = useState("login");
-  
-  // Login states
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  
-  // Reset states
+
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
-  // Login submit
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      return;
+    }
+
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = prefersDark ? "dark" : "light";
+
+    setTheme(initialTheme);
+    document.documentElement.setAttribute("data-theme", initialTheme);
+  }, []);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("theme", nextTheme);
+  }
+
   async function onLogin(e) {
     e.preventDefault();
     setErr("");
@@ -31,12 +53,14 @@ export default function Login() {
     try {
       await adminLogin(email.trim(), password);
       const redirectTo = loc.state?.from?.pathname || "/admin";
-      nav(redirectTo, { replace: true });
       toast.success("Login realizado com sucesso!");
+      nav(redirectTo, { replace: true });
     } catch (error) {
-      const msg = error?.response?.data?.detail || 
-                  error?.response?.data?.message || 
-                  "Falha no login. Verifique e-mail e senha.";
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.message ||
+        "Falha no login. Verifique e-mail e senha.";
+
       setErr(msg);
       toast.error(msg);
     } finally {
@@ -44,7 +68,6 @@ export default function Login() {
     }
   }
 
-  // Reset request
   async function onResetRequest(e) {
     e.preventDefault();
     setResetLoading(true);
@@ -52,7 +75,7 @@ export default function Login() {
     try {
       const message = await resetPasswordRequest(resetEmail.trim());
       setResetSent(true);
-      toast.success(message);
+      toast.success(message || "Email de recuperação enviado.");
       setResetEmail("");
     } catch (error) {
       toast.error("Erro ao enviar email. Tente novamente.");
@@ -61,45 +84,75 @@ export default function Login() {
     }
   }
 
+  function goHome() {
+    nav("/", { replace: true });
+  }
+
+  function backToLogin() {
+    setTab("login");
+    setResetSent(false);
+  }
+
   return (
     <div className={styles.page}>
       <div className="container">
+        <div className={styles.topBar}>
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+          >
+            {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo escuro"}
+          </button>
+        </div>
+
         <header className={styles.hero}>
           <div className={styles.brand}>
             <img className={styles.logo} src="/logo.png" alt="Pena de Morte" />
             <h1 className={styles.title}>Área Admin</h1>
             <p className={styles.subtitle}>
-              {tab === "login" 
-                ? "Entre com seu e-mail e senha para acessar o painel." 
-                : "Digite seu email para receber o link de recuperação."
-              }
+              {tab === "login"
+                ? "Entre com seu e-mail e senha para acessar o painel."
+                : "Digite seu email para receber o link de recuperação."}
             </p>
           </div>
         </header>
 
         <main className={styles.main}>
           <section className={styles.card}>
-            {/* Tabs */}
-            <div className={styles.tabs}>
-              <button 
+            <div className={styles.tabs} role="tablist" aria-label="Acesso administrativo">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === "login"}
                 className={`${styles.tab} ${tab === "login" ? styles.active : ""}`}
-                onClick={() => setTab("login")}
+                onClick={() => {
+                  setTab("login");
+                  setErr("");
+                }}
               >
                 Entrar
               </button>
-              <button 
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === "reset"}
                 className={`${styles.tab} ${tab === "reset" ? styles.active : ""}`}
-                onClick={() => setTab("reset")}
+                onClick={() => {
+                  setTab("reset");
+                  setErr("");
+                }}
               >
                 Recuperar Senha
               </button>
             </div>
 
-            {/* Login Form */}
             {tab === "login" && (
               <form className={styles.form} onSubmit={onLogin}>
                 <label className={styles.label}>
-                  E-mail
+                  <span>E-mail</span>
                   <input
                     className={styles.input}
                     value={email}
@@ -112,7 +165,7 @@ export default function Login() {
                 </label>
 
                 <label className={styles.label}>
-                  Senha
+                  <span>Senha</span>
                   <input
                     className={styles.input}
                     value={password}
@@ -134,7 +187,7 @@ export default function Login() {
                   <button
                     className="btn-ghost"
                     type="button"
-                    onClick={() => nav("/", { replace: true })}
+                    onClick={goHome}
                     disabled={loading}
                   >
                     Voltar
@@ -147,11 +200,10 @@ export default function Login() {
               </form>
             )}
 
-            {/* Reset Form */}
             {tab === "reset" && (
               <form className={styles.form} onSubmit={onResetRequest}>
                 <label className={styles.label}>
-                  E-mail
+                  <span>E-mail</span>
                   <input
                     className={styles.input}
                     value={resetEmail}
@@ -165,23 +217,29 @@ export default function Login() {
 
                 {resetSent ? (
                   <div className={styles.successBox}>
-                     Email enviado! Verifique sua caixa de entrada (válido 15min).
-                    <br/>
-                    <small>Não recebeu? <button 
-                      type="button" 
-                      onClick={() => setResetSent(false)}
-                      className={styles.linkBtn}
-                    >Tentar novamente</button></small>
+                    Email enviado! Verifique sua caixa de entrada.
+                    <br />
+                    <small>
+                      O link é temporário.{" "}
+                      <button
+                        type="button"
+                        onClick={() => setResetSent(false)}
+                        className={styles.linkBtn}
+                      >
+                        Tentar novamente
+                      </button>
+                    </small>
                   </div>
                 ) : (
                   <div className={styles.actions}>
                     <button className="btn-primary" type="submit" disabled={resetLoading}>
                       {resetLoading ? "Enviando..." : "Enviar Link"}
                     </button>
+
                     <button
                       className="btn-ghost"
                       type="button"
-                      onClick={() => setTab("login")}
+                      onClick={backToLogin}
                       disabled={resetLoading}
                     >
                       Voltar ao Login
@@ -190,7 +248,7 @@ export default function Login() {
                 )}
 
                 <small className={styles.hint}>
-                  Receberá um link seguro por email.
+                  Você receberá um link seguro por email.
                 </small>
               </form>
             )}

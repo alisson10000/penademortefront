@@ -12,6 +12,8 @@ import AdsList from "../../components/AdsList";
 export default function AdminAdsPage() {
   const navigate = useNavigate();
 
+  const [theme, setTheme] = useState("light");
+
   const [ads, setAds] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,13 +22,37 @@ export default function AdminAdsPage() {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      return;
+    }
+
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = prefersDark ? "dark" : "light";
+
+    setTheme(initialTheme);
+    document.documentElement.setAttribute("data-theme", initialTheme);
+  }, []);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("theme", nextTheme);
+  }
+
+  useEffect(() => {
     let alive = true;
 
     async function loadAll() {
       try {
         const token = getToken();
+
         if (!token) {
-          navigate("/login");
+          navigate("/login", { replace: true });
           return;
         }
 
@@ -41,6 +67,7 @@ export default function AdminAdsPage() {
         setQuestions(questionsData);
       } catch (err) {
         console.error(err);
+
         if (!alive) return;
 
         const msg =
@@ -52,7 +79,7 @@ export default function AdminAdsPage() {
 
         if (err?.response?.status === 401) {
           clearToken();
-          navigate("/login");
+          navigate("/login", { replace: true });
         }
       } finally {
         if (alive) setLoading(false);
@@ -60,15 +87,16 @@ export default function AdminAdsPage() {
     }
 
     loadAll();
+
     return () => {
       alive = false;
     };
   }, [navigate]);
 
-  const handleCreateAd = async (adData) => {
+  async function handleCreateAd(adData) {
     try {
       const newAd = await adService.createAd(adData);
-      setAds([...ads, newAd]);
+      setAds((prev) => [...prev, newAd]);
       setShowForm(false);
       setError("");
     } catch (err) {
@@ -76,15 +104,16 @@ export default function AdminAdsPage() {
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
         "Erro ao criar propaganda.";
+
       setError(msg);
       console.error(err);
     }
-  };
+  }
 
-  const handleUpdateAd = async (adId, adData) => {
+  async function handleUpdateAd(adId, adData) {
     try {
       const updated = await adService.updateAd(adId, adData);
-      setAds(ads.map((a) => (a.id === adId ? updated : a)));
+      setAds((prev) => prev.map((ad) => (ad.id === adId ? updated : ad)));
       setEditingAd(null);
       setError("");
     } catch (err) {
@@ -92,34 +121,59 @@ export default function AdminAdsPage() {
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
         "Erro ao atualizar propaganda.";
+
       setError(msg);
       console.error(err);
     }
-  };
+  }
 
-  const handleDeleteAd = async (adId) => {
+  async function handleDeleteAd(adId) {
     if (!window.confirm("Tem certeza que deseja deletar esta propaganda?")) {
       return;
     }
 
     try {
       await adService.deleteAd(adId);
-      setAds(ads.filter((a) => a.id !== adId));
+      setAds((prev) => prev.filter((ad) => ad.id !== adId));
       setError("");
     } catch (err) {
       const msg =
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
         "Erro ao deletar propaganda.";
+
       setError(msg);
       console.error(err);
     }
-  };
+  }
+
+  function handleOpenCreate() {
+    setShowForm(true);
+    setEditingAd(null);
+    setError("");
+  }
+
+  function handleCancelForm() {
+    setShowForm(false);
+    setEditingAd(null);
+    setError("");
+  }
 
   if (loading) {
     return (
       <div className={styles.page}>
         <div className="container">
+          <div className={styles.topBar}>
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+            >
+              {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo escuro"}
+            </button>
+          </div>
+
           <div className={styles.stateBox}>
             <h2>Carregando...</h2>
             <p>Aguarde um instante.</p>
@@ -132,76 +186,87 @@ export default function AdminAdsPage() {
   return (
     <div className={styles.page}>
       <div className="container">
-        {/* HEADER */}
+        <div className={styles.topBar}>
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+          >
+            {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo escuro"}
+          </button>
+        </div>
+
         <header className={styles.header}>
-          <div>
-            <h1 className={styles.title}>Gerenciar Propagandas</h1>
-            <p className={styles.subtitle}>
-              Crie e edite propagandas para as perguntas
-            </p>
+          <div className={styles.headerContent}>
+            <img className={styles.logo} src="/logo.png" alt="Pena de Morte" />
+            <div>
+              <h1 className={styles.title}>Gerenciar Propagandas</h1>
+              <p className={styles.subtitle}>
+                Crie, edite e organize propagandas vinculadas às perguntas.
+              </p>
+            </div>
           </div>
 
           <div className={styles.actions}>
             <button
+              type="button"
               className="btn-primary"
               onClick={() => {
-                setShowForm(!showForm);
-                setEditingAd(null);
-                setError("");
+                if (showForm) {
+                  handleCancelForm();
+                } else {
+                  handleOpenCreate();
+                }
               }}
             >
-              {showForm ? " Cancelar" : " Nova Propaganda"}
+              {showForm ? "Cancelar" : "Nova Propaganda"}
             </button>
 
             <button
+              type="button"
               className="btn-ghost"
               onClick={() => navigate("/admin", { replace: true })}
             >
-               Voltar
+              Voltar
             </button>
           </div>
         </header>
 
-        {/* ALERT DE ERRO */}
-        {error && (
+        {error ? (
           <div className={styles.alert}>
             <strong>Erro:</strong> {error}
           </div>
-        )}
+        ) : null}
 
-        {/* FORMULÁRIO CRIAR */}
-        {showForm && !editingAd && (
+        {showForm && !editingAd ? (
           <section className={styles.section}>
             <h2>Nova Propaganda</h2>
-            <AdForm
-              questions={questions}
-              onSubmit={handleCreateAd}
-              onCancel={() => {
-                setShowForm(false);
-                setError("");
-              }}
-            />
+            <div className={styles.panel}>
+              <AdForm
+                questions={questions}
+                onSubmit={handleCreateAd}
+                onCancel={handleCancelForm}
+              />
+            </div>
           </section>
-        )}
+        ) : null}
 
-        {/* FORMULÁRIO EDITAR */}
-        {editingAd && (
+        {editingAd ? (
           <section className={styles.section}>
             <h2>Editar Propaganda #{editingAd.id}</h2>
-            <AdForm
-              questions={questions}
-              initialData={editingAd}
-              onSubmit={(data) => handleUpdateAd(editingAd.id, data)}
-              onCancel={() => {
-                setEditingAd(null);
-                setError("");
-              }}
-              isEditing
-            />
+            <div className={styles.panel}>
+              <AdForm
+                questions={questions}
+                initialData={editingAd}
+                onSubmit={(data) => handleUpdateAd(editingAd.id, data)}
+                onCancel={handleCancelForm}
+                isEditing
+              />
+            </div>
           </section>
-        )}
+        ) : null}
 
-        {/* LISTA DE ADS */}
         <section className={styles.section}>
           <h2>Propagandas ({ads.length})</h2>
 
@@ -209,25 +274,26 @@ export default function AdminAdsPage() {
             <div className={styles.emptyState}>
               <p>Nenhuma propaganda cadastrada ainda.</p>
               <button
+                type="button"
                 className="btn-primary"
-                onClick={() => {
-                  setShowForm(true);
-                  setEditingAd(null);
-                }}
+                onClick={handleOpenCreate}
               >
                 Criar primeira propaganda
               </button>
             </div>
           ) : (
-            <AdsList
-              ads={ads}
-              questions={questions}
-              onEdit={(ad) => {
-                setEditingAd(ad);
-                setShowForm(false);
-              }}
-              onDelete={handleDeleteAd}
-            />
+            <div className={styles.listWrap}>
+              <AdsList
+                ads={ads}
+                questions={questions}
+                onEdit={(ad) => {
+                  setEditingAd(ad);
+                  setShowForm(false);
+                  setError("");
+                }}
+                onDelete={handleDeleteAd}
+              />
+            </div>
           )}
         </section>
       </div>
