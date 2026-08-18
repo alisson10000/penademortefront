@@ -8,6 +8,7 @@ import { adminLogin, resetPasswordRequest } from "../../services/auth";
 export default function Login() {
   const nav = useNavigate();
   const loc = useLocation();
+  const logoSrc = `${import.meta.env.BASE_URL}logo.png`;
 
   const [theme, setTheme] = useState("light");
 
@@ -109,7 +110,7 @@ export default function Login() {
 
         <header className={styles.hero}>
           <div className={styles.brand}>
-            <img className={styles.logo} src="/logo.png" alt="Pena de Morte" />
+            <img className={styles.logo} src={logoSrc} alt="Pena de Morte" />
             <h1 className={styles.title}>Área Admin</h1>
             <p className={styles.subtitle}>
               {tab === "login"

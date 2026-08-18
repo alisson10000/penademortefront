@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./HomePage.module.css";
 
 export default function Home() {
   const [theme, setTheme] = useState("light");
+  const logoSrc = `${import.meta.env.BASE_URL}logo.png`;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -45,7 +47,7 @@ export default function Home() {
         {/* HERO */}
         <header className={styles.hero}>
           <div className={styles.brand}>
-            <img className={styles.logo} src="/logo.png" alt="Pena de Morte" />
+            <img className={styles.logo} src={logoSrc} alt="Pena de Morte" />
             <h1 className={styles.title}>Pena de Morte</h1>
             <p className={styles.subtitle}>
               Pesquisa de opinião com transparência. Responda em poucos segundos e acompanhe
@@ -60,11 +62,11 @@ export default function Home() {
               </button>
             </a>
 
-            <a href="/login">
+            <Link to="/login">
               <button type="button" className="btn-ghost">
                 Área Admin
               </button>
-            </a>
+            </Link>
           </div>
         </header>
 
