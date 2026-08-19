@@ -1,3 +1,6 @@
+-- Ensure the import connection reads this script as UTF-8.
+SET NAMES utf8mb4;
+
 INSERT INTO `questions` (`id`, `text`, `content`, `active`, `order_index`) VALUES
 (1,
 '01 — SERÁ QUE FOI DEUS QUEM CRIOU A PENA DE MORTE? FAÇA O DOWNLOAD DA BÍBLIA ONLINE E CONHEÇA O AUTOR DA PENA DE MORTE: GÊNESIS 9:5, 6.',
